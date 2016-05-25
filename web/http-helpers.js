@@ -11,9 +11,22 @@ exports.headers = headers = {
 };
 
 exports.serveAssets = function(res, asset, callback) {
+  var temp =[];
+  console.log('calling serveAssets')
+  //use fs readFile or createReadStream
+  fs.readFile(asset, function(err, data) {
+    if (err) {
+      throw err;
+    }
+    temp.push(data);
+    callback(temp);
+  });
   // Write some code here that helps serve up your static files!
   // (Static files are things like html (yours or archived from others...),
   // css, or anything that doesn't change often.)
+
+  //callback does something with asset or data
+  // write response body of the asset
 };
 
   // Write some code here that helps serve up your static files!
