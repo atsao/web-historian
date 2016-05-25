@@ -4,53 +4,83 @@ var http = require('http-request');
 var helpers = require('./http-helpers');
 // require more modules/folders here!
 //genaric functions 
-var sendResponse = function(req, res, data, statusCode) {
+var sendResponse = function(request, response, data, statusCode) {
     statusCode = statusCode || 200;
     // var tempHeaders = helpers.headers;
     var mimeType;
 
-    console.log('req.url: ', req.url);
-    console.log('path extname:', path.extname(req.url));
+    // console.log('request.url: ', request.url);
+    // console.log('path extname:', path.extname(request.url));
 
-    if (path.extname(req.url) !== '') {
-      mimeType = 'text/' + path.extname(req.url).split('.')[1];
+    if (path.extname(request.url) !== '') {
+      mimeType = 'text/' + path.extname(request.url).split('.')[1];
     } else {
       mimeType = 'text/html';
     }
-    console.log('mimeType:', mimeType);
 
-    res.setHeader("Content-Type", mimeType);
-    res.writeHead(statusCode, helpers.headers);
-    res.end(data);
+    // console.log('mimeType:', mimeType);
+
+    response.setHeader("Content-Type", mimeType);
+    response.writeHead(statusCode, helpers.headers);
+    response.end(data);
 }
 var methods = {
-  'GET': function  (req, res, filePathname) {
-    helpers.serveAssets(res, filePathname, function(data){
-    // console.log('data', data);
-    sendResponse(req, res, data);
-    })
+  'GET': function  (request, response, pathname) {
+    var fileName = path.basename(request.url) || 'index.html';
+    var fullPath = pathname + '/' + fileName;
+
+    helpers.serveAssets(response, fullPath, function(data){
+      // console.log('data', data);
+      sendResponse(request, response, data);
+    });
   },
-  'POST': function (res, data, statusCode, page) {
+  'POST': function (request, response) {
+    console.log("POST!");
+    // archive.readListOfUrls();
+    // console.log('request.url:', request.url);
+    // archive.isUrlInList(request.url);
+
+    var body = '';
+
+    request.on('data', function(chunk) {
+      // console.log('le chunk:', chunk);
+      body += chunk;
+      console.log('body:', body);
+      console.log('body type:', typeof body);
+      archive.isUrlInList(JSON.parse(body).url);
+    });
+
+    request.on('end', function(data) {
+      console.log('end of POST')
+      response.writeHead(302);
+      response.end();
+
+    });
+
 
   }
 };
 
-exports.handleRequest = function (req, res, page) {
-  // res.end(archive.paths.list);
-  console.log("Serving request type " + req.method + " for url " + req.url);
-
-  var fileName = path.basename(req.url) || 'index.html';
+var getPathname = function(request) {
+  var fileName = path.basename(request.url) || 'index.html';
   var localDir = __dirname + '/public/';
-
-  console.log('fileName:', fileName);
-  console.log('localDir:', localDir);
-
-  var action = methods[req.method];
-  if (action) {
-    action(req, res, localDir + fileName);
-
-  } else {
-    sendResponse(res, "Not Found", 404);
-  }
+  var filePathname = localDir + fileName;
 };
 
+
+exports.handleRequest = function(pathname) {
+  var pathname = pathname;
+
+  return function (request, response) {
+    // response.end(archive.paths.list);
+    console.log("Serving request type " + request.method + " for url " + request.url);
+
+    var action = methods[request.method];
+    if (action) {
+      action(request, response, pathname);
+
+    } else {
+      sendResponse(response, "Not Found", 404);
+    }
+  };
+};

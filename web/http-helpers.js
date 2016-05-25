@@ -10,37 +10,21 @@ exports.headers = headers = {
   // 'Content-Type': "text/html"
 };
 
-exports.serveAssets = function(res, asset, callback) {
-  // var temp =[];
-  // console.log('calling serveAssets')
-  // //use fs readFile or createReadStream
-  // fs.readFile(asset, function(err, data) {
-  //   if (err) {
-  //     throw err;
-  //   }
-  //   temp.push(data);
-  //   callback(temp);
-  // });
-  // Write some code here that helps serve up your static files!
-  // (Static files are things like html (yours or archived from others...),
-  // css, or anything that doesn't change often.)
-
-  //callback does something with asset or data
-  // write response body of the asset
+exports.serveAssets = function(response, asset, callback) {
 
   fs.exists(asset, function(exists) {
     if (exists) {
       fs.readFile(asset, function(error, contents) {
         if (!error) {
-          // res.end(contents);
+          // response.end(contents);
           callback(contents);
         } else {
           console.error(error);
         }
       });
     } else {
-      res.writeHead(404, {'Content-Type': 'text/html'});
-      res.end(contents);
+      response.writeHead(404, {'Content-Type': 'text/html'});
+      response.end(contents);
     }
   })
 

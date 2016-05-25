@@ -54,6 +54,7 @@ describe("server", function() {
 
         // Reset the test file and process request
         fs.closeSync(fs.openSync(archive.paths.list, "w"));
+        console.log('start time', new Date());
 
         request
           .post("/")
