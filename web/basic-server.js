@@ -11,13 +11,14 @@ var port = 8080;
 var ip = "127.0.0.1";
 //route obj
 var routes = {
-  '/': handler.handleRequest
+  '/': handler.handleRequest,
+  '/styles.css': handler.handleRequest
 };
 var server = http.createServer( function (request, response) {
-
-  var route = parser.parse(request.url).pathname;
-  if (routes[route]) {
-    routes[route](request, response, page);
+  console.log("Serving request type:", request.method, " for URL:", request.url);
+  var route = routes[parser.parse(request.url).pathname];
+  if (route) {
+    route(request, response);
   }
 });
 
