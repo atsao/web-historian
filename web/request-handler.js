@@ -47,7 +47,15 @@ var methods = {
       body += chunk;
       console.log('body:', body);
       console.log('body type:', typeof body);
-      archive.isUrlInList(JSON.parse(body).url);
+      body = JSON.parse(body);
+      if (archive.isUrlInList(body.url)) {
+        
+      } else {
+        archive.addUrlToList(body.url, function(){
+          response.writeHead(302);
+          response.end();
+        })
+      };
     });
 
     request.on('end', function(data) {

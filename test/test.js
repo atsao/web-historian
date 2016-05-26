@@ -54,7 +54,7 @@ describe("server", function() {
 
         // Reset the test file and process request
         fs.closeSync(fs.openSync(archive.paths.list, "w"));
-        console.log('start time', new Date());
+
 
         request
           .post("/")
@@ -90,10 +90,12 @@ describe("archive helpers", function(){
       var urlArray = ["example1.com", "example2.com"];
       fs.writeFileSync(archive.paths.list, urlArray.join("\n"));
 
+
       var counter = 0;
       var total = 2;
 
       archive.isUrlInList("example1.com", function (is) {
+        console.log('is', is);
         expect(is);
         if (++counter == total) { done() }
       });

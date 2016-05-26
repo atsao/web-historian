@@ -38,27 +38,28 @@ exports.readListOfUrls = function(callback){
 
 };
 
-exports.isUrlInList = function(url){
-  exports.readListOfUrls(function(data) {
-    // console.log('inside urlinlist', data);
+exports.isUrlInList = function(url, callbackTrue, callbackFalse){
+  return exports.readListOfUrls(function(data) {
+    console.log('inside urlinlist', data);
     // console.log('*** LIST:', list);
     if (data.indexOf(url) !== -1) {
+      console.log('found');
       return true;
     } else {
-      console.log('write', url);
-      exports.addUrlToList(url);
+      // console.log('write', url);
+      // exports.addUrlToList(url);
+      return false;
     }
   });
 };
 
-exports.addUrlToList = function(url){
+exports.addUrlToList = function(url, callback){
   // writeFile
   console.log('before url:', url);
-  fs.writeFileSync(exports.paths.list, url, {encoding: 'utf8', flag: 'a'})//, function(error, data) {
-
-    console.log('writen data:', new Date());
-    
-  //})
+  console.log('path', exports.paths.list);
+  fs.writeFile(exports.paths.list, url + '\n', {encoding: 'utf8', flag: 'a'}, function(error, data) {
+    callback(data);
+  })
 };
 
 exports.isUrlArchived = function(url){
