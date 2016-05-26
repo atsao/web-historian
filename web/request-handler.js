@@ -45,33 +45,76 @@ var methods = {
     request.on('data', function(chunk) {
       // console.log('le chunk:', chunk);
       body += chunk;
-      console.log('body:', body);
-      console.log('body type:', typeof body);
+      // console.log('body:', body);
+      // console.log('body type:', typeof body);
       body =body.split('=');
-      console.log('split body', body);
+      // console.log('split body', body);
       var test1 = body[0];
       var test2 = body[1];
       body = {};
       body.url = test2;
-      console.log(body);
+      // console.log(body);
       body = JSON.stringify(body);
       body = JSON.parse(body);
-      if (archive.isUrlInList(body.url)) {
-        console.log('blah');
-        archive.isUrlArchived(body.url, function(url, response) {
-          helpers.serveAssets(response, archive.paths.archivedSites + '/' + url, function(data) {
-            sendResponse(request, response, data);
-          })
-        });
-      } else {
-        archive.addUrlToList(body.url, function(){
-          helpers.serveAssets(response, archive.paths.siteAssets + '/' + 'loading.html', function(data) {
-            sendResponse(request, response, data);
-          })
-          // response.writeHead(302);
-          // response.end();
-        });
-      };
+      // console.log('site to be added', body.url);
+      // console.log('isUrl result', archive.isUrlInList(body.url))
+
+      archive.readListOfUrls(function(data) {
+        if (data) {
+          archive.isUrlInList(body.url, data, function(found) {
+            if (found) {
+              console.log('found this thing');
+
+              archive.isUrlArchived(body.url, function(archived) {
+                console.log('in check for archive');
+                if (archived) {
+                  console.log('already archived');
+                } else {
+                  console.log('not archived yet. do so');
+                  helpers.serveAssets(response, archive.paths.siteAssets + '/' + 'loading.html', function(data) {
+                    sendResponse(request, response, data);
+                  });
+                }
+              })
+            } else {
+              console.log('not found. add it');
+
+            }
+          });
+        }
+      })
+
+      // archive.isUrlInList(body.url, function(found, url) {
+      //   console.log(found);
+      //   if (found) {
+      //     console.log('found in list in callback')
+      //     // archive.isUrlArchived(url, function(data) {
+      //     //   console.log(data);
+      //     // })
+      //     // helpers.serveAssets(response, archive.paths.archivedSites + '/' + url, function(data) {
+      //     //   sendResponse(request, response, data, 200);
+      //     // })
+      //   }
+      //       sendResponse(request, response, data, 200);
+
+      // });
+
+      // if (archive.isUrlInList(body.url)) {
+      //   console.log('blah');
+      //   archive.isUrlArchived(body.url, function(url, response) {
+      //     helpers.serveAssets(response, archive.paths.archivedSites + '/' + url, function(data) {
+      //       sendResponse(request, response, data);
+      //     })
+      //   });
+      // } else {
+      //   archive.addUrlToList(body.url, function(){
+      //     helpers.serveAssets(response, archive.paths.siteAssets + '/' + 'loading.html', function(data) {
+      //       sendResponse(request, response, data);
+      //     })
+      //     // response.writeHead(302);
+      //     // response.end();
+      //   });
+      // };
     });
 
     // request.on('end', function(data) {

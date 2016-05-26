@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var http = require('http-request');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -38,30 +39,12 @@ exports.readListOfUrls = function(callback){
 
 };
 
-exports.isUrlInList = function(url, callback){
-  return exports.readListOfUrls(function(data) {
-    console.log('inside urlinlist', data);
-    // console.log('*** LIST:', list);
-    if (data.indexOf(url) !== -1) {
-      console.log('found');
-      if (callback) {
-        return callback(this);
-      } else {
-        return true;
-      }
-      // return true;
-    } else {
-      console.log('not found');
-      // console.log('write', url);
-      // exports.addUrlToList(url);
-      // return false;
-      if (callback) {
-        return callback(this);
-      } else {
-        return false;
-      }
-    }
-  });
+exports.isUrlInList = function(url, list, callback){
+  if (list.indexOf(url) !== -1) {
+    callback(true);
+  } else {
+    callback(false);
+  }
 };
 
 exports.addUrlToList = function(url, callback){
@@ -74,15 +57,40 @@ exports.addUrlToList = function(url, callback){
 };
 
 exports.isUrlArchived = function(url, callback){
-  // readFile? in archives folder?
-  var path = exports.paths.list + '/' + url;
+  var path = exports.paths.archivedSites + '/' + url;
 
-  return fs.exists(path, function(exists) {
+  fs.exists(path, function(exists) {
     if (exists) {
-      callback(url); // ????
+      callback(true); // ????
+    } else {
+      callback(false);
     }
   })
 };
 
-exports.downloadUrls = function(){
+exports.downloadUrls = function(urlArray, callback){
+  _.each(urlArray, function(url) {
+
+    // Get request for file at URL
+    http.get(url, function(error, res) {
+      console.log('inside http get!');
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      var path = exports.paths.archivedSites + '/' + url;
+      // writeFile to archives/sites folder
+      fs.writeFile(path, res.buffer.toString(), 'utf8', function(error, data){
+        if (error) {
+          console.error(error);
+          return;
+        }
+      });
+      // Clean up sites.txt after download
+      
+    });
+  });
+
+
 };

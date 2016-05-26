@@ -88,8 +88,6 @@ describe("archive helpers", function(){
   describe("#isUrlInList", function () {
     it("should check if a url is in the list", function (done) {
       var urlArray = ["example1.com", "example2.com"];
-      console.log('writing test');
-      console.log(new Date());
       fs.writeFileSync(archive.paths.list, urlArray.join("\n"));
 
 
@@ -97,7 +95,6 @@ describe("archive helpers", function(){
       var total = 2;
 
       archive.isUrlInList("example1.com", function (is) {
-        // console.log('is', is);
         expect(is);
         if (++counter == total) { done() }
       });
@@ -152,7 +149,7 @@ describe("archive helpers", function(){
       setTimeout(function () {
         expect(fs.readdirSync(archive.paths.archivedSites)).to.deep.equal(urlArray);
         done();
-      }, 25);
+      }, 1000);
     });
   });
 });
