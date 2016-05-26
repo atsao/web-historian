@@ -47,6 +47,14 @@ var methods = {
       body += chunk;
       console.log('body:', body);
       console.log('body type:', typeof body);
+      body =body.split('=');
+      console.log('split body', body);
+      var test1 = body[0];
+      var test2 = body[1];
+      body = {};
+      body.url = test2;
+      console.log(body);
+      body = JSON.stringify(body);
       body = JSON.parse(body);
       if (archive.isUrlInList(body.url)) {
         console.log('blah');
