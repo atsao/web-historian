@@ -58,20 +58,28 @@ var methods = {
       body = JSON.parse(body);
       if (archive.isUrlInList(body.url)) {
         console.log('blah');
+        archive.isUrlArchived(body.url, function(url, response) {
+          helpers.serveAssets(response, archive.paths.archivedSites + '/' + url, function(data) {
+            sendResponse(request, response, data);
+          })
+        });
       } else {
         archive.addUrlToList(body.url, function(){
-          response.writeHead(302);
-          response.end();
-        })
+          helpers.serveAssets(response, archive.paths.siteAssets + '/' + 'loading.html', function(data) {
+            sendResponse(request, response, data);
+          })
+          // response.writeHead(302);
+          // response.end();
+        });
       };
     });
 
-    request.on('end', function(data) {
-      console.log('end of POST')
-      response.writeHead(302);
-      response.end();
+    // request.on('end', function(data) {
+    //   console.log('end of POST')
+    //   response.writeHead(302);
+    //   response.end();
 
-    });
+    // });
 
 
   }

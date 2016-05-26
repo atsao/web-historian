@@ -73,8 +73,15 @@ exports.addUrlToList = function(url, callback){
   })
 };
 
-exports.isUrlArchived = function(url){
+exports.isUrlArchived = function(url, callback){
   // readFile? in archives folder?
+  var path = exports.paths.list + '/' + url;
+
+  return fs.exists(path, function(exists) {
+    if (exists) {
+      callback(url); // ????
+    }
+  })
 };
 
 exports.downloadUrls = function(){
