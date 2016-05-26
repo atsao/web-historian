@@ -38,17 +38,28 @@ exports.readListOfUrls = function(callback){
 
 };
 
-exports.isUrlInList = function(url, callbackTrue, callbackFalse){
+exports.isUrlInList = function(url, callback){
   return exports.readListOfUrls(function(data) {
     console.log('inside urlinlist', data);
     // console.log('*** LIST:', list);
     if (data.indexOf(url) !== -1) {
       console.log('found');
-      return true;
+      if (callback) {
+        return callback(this);
+      } else {
+        return true;
+      }
+      // return true;
     } else {
+      console.log('not found');
       // console.log('write', url);
       // exports.addUrlToList(url);
-      return false;
+      // return false;
+      if (callback) {
+        return callback(this);
+      } else {
+        return false;
+      }
     }
   });
 };

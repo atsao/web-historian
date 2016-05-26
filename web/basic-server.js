@@ -19,6 +19,7 @@ var routes = {
 };
 
 var server = http.createServer( function (request, response) {
+  console.log("Serving request type before router " + request.method + " for url " + request.url);
   var route = routes[parser.parse(request.url).pathname];
 
   if (route) {

@@ -49,7 +49,7 @@ var methods = {
       console.log('body type:', typeof body);
       body = JSON.parse(body);
       if (archive.isUrlInList(body.url)) {
-        
+        console.log('blah');
       } else {
         archive.addUrlToList(body.url, function(){
           response.writeHead(302);
