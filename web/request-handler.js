@@ -29,10 +29,21 @@ var methods = {
     var fileName = path.basename(request.url) || 'index.html';
     var fullPath = pathname + '/' + fileName;
 
-    helpers.serveAssets(response, fullPath, function(data){
-      // console.log('data', data);
-      sendResponse(request, response, data);
-    });
+    archive.readListOfUrls(function(list) {
+      if (list) {
+        archive.isUrlInList(fullPath, list, function(found) {
+          if (found || fileName === 'index.html') {
+            helpers.serveAssets(response, fullPath, function(data){
+              // console.log('data', data);
+              sendResponse(request, response, data);
+            });
+          } else {
+            sendResponse(request, response, "Not Found", 404);
+          }
+        });
+      }
+    })
+
   },
   'POST': function (request, response) {
     console.log("POST!");
@@ -69,16 +80,25 @@ var methods = {
                 console.log('in check for archive');
                 if (archived) {
                   console.log('already archived');
+                  helpers.serveAssets(response, archive.paths.archivedSites + '/' + body.url, function(data) {
+                    sendResponse(request, response, data, 302);
+                  });
                 } else {
                   console.log('not archived yet. do so');
+                  archive.downloadUrls([body.url]);
                   helpers.serveAssets(response, archive.paths.siteAssets + '/' + 'loading.html', function(data) {
-                    sendResponse(request, response, data);
+                    sendResponse(request, response, data, 302);
                   });
                 }
               })
             } else {
               console.log('not found. add it');
-
+              archive.addUrlToList(body.url, function() {
+                archive.downloadUrls([body.url]);
+                helpers.serveAssets(response, archive.paths.siteAssets + '/' + 'loading.html', function(data) {
+                    sendResponse(request, response, data, 302);
+                  });
+              })
             }
           });
         }

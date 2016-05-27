@@ -22,5 +22,5 @@ module.exports = function () {
     fs.mkdirSync("./archives/sites");
   }
 
-  fetcher.fetchSite();
+  fetcher.fetchSite.start();
 };
